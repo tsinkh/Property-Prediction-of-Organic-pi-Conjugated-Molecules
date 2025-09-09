@@ -1,0 +1,21 @@
+All values are in eV
+
+Field: description
+
+identifier: OCELOT ID
+vie: vertical ionization energy
+aie: adiabatic ionization energy
+vea: vertical electron affinity
+aea: adiabatic electron affinity
+hl: HOMO LUMO gap
+s0s1: vertical first singlet energy
+s0t1: vertical first triplet energy
+hr: inner sphere hole reorganization energy
+cr1: cation relaxation energy 1 (refer article for details)
+cr2: cation relaxation energy 2 (refer article for details)
+er: inner sphere hole reorganization energy
+ar1: anion relaxation energy 1 (refer article for details)
+ar2: anion relaxation energy 2 (refer article for details)
+lumo: energy of LUMO
+homo: energy of HOMO
+smiles: SMILES representation of molecule

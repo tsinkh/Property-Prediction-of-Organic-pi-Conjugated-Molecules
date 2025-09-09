@@ -1,0 +1,11 @@
+torch==1.10
+torchvision
+dgl==0.7.2
+dgl-lifesci==0.2.8
+scikit-learn==0.24.2
+rdkit-pypi
+optuna==2.10.0
+uncertainty-toolbox
+pandas
+numpy
+matplotlib

@@ -1,0 +1,63 @@
+﻿Descriptors,Description,Type
+ExactMolWt,Precise molecular weight,Float
+FpDensityMorgan1,"Morgan fingerprint, radius 1",Float
+FpDensityMorgan2,"Morgan fingerprint, radius 2",Float
+FpDensityMorgan3,"Morgan fingerprint, radius 3",Float
+HeavyAtomMolWt,Weight calculated without any hydrogens,Float
+MolWt,Molecular weight using ineteger values,Integer
+NumRadicalElectrons,Radical electrons in a molecule,Integer
+NumValenceElectrons,Total valence electrons for all atoms,Integer
+CalcAUTOCORR2D#vector,Autocorrelation vector using the molecule's 2D graph; 192 elements ,Vector of floats
+CalcChi0n,Methodology found in https://doi.org/10.1002/9780470125793.ch9,Float
+CalcChi0v,All fruther chi descriptors are calcualted by RDKit using the methodology referenced,Float
+CalcChi1n,,Float
+CalcChi1v,,Float
+CalcChi2n,,Float
+CalcChi2v,,Float
+CalcChi3n,,Float
+CalcChi3v,,Float
+CalcChi4n,,Float
+CalcChi4v,,Float
+CalcCrippenDescriptors,RDKit's implementation of Wildman-Crippen logp and molar refractivity values; 2 elements ,Pair of floats
+CalcFractionCSP3,fraction of C atoms that are SP3 hybridized,Float
+CalcHallKierAlpha,"Like Chi descriptors, Alpha methodology found here https://doi.org/10.1002/9780470125793.ch9",Float
+CalcKappa1,"Like Chi descriptors, all Kappa methodology found here https://doi.org/10.1002/9780470125793.ch9",Float
+CalcKappa2,,Float
+CalcKappa3,,Float
+CalcLabuteASA,Rdkit's implementation of Labute's Approximate Surface Area,Float
+CalcNumAliphaticCarbocycles,Number of aliphatic rings which contain only carbon,Integer
+CalcNumAliphaticHeterocycles,Aliphatic rings with more than 1 atom type,Integer
+CalcNumAliphaticRings,Total number of aliphatic rings,Integer
+CalcNumAmideBonds,Bonds to nitrogen,Integer
+CalcNumAromaticCarbocycles,Aromatic rings with only carbon,Integer
+CalcNumAromaticHeterocycles,Aromatic rings with more than 1 atom type,Integer
+CalcNumAromaticRings,All aromatic rings,Integer
+CalcNumAtomStereoCenters,RDKit's guess at total # of chiral centers,Integer
+CalcNumBridgeheadAtoms, Number of atoms that are part of two or more rings ,Integer
+CalcNumHBA,Number of hydrogen bond acceptors,Integer
+CalcNumHBD,Number of hydrogen bond donors,Integer
+CalcNumHeteroatoms,Number of non-carbon atoms,Integer
+CalcNumHeterocycles,Number of rings which contain non-carbon atoms,Integer
+CalcNumLipinskiHBA,Lipinski H-bond acceptors for a molecule,Integer
+CalcNumLipinskiHBD,Lipinski H-bond donors for a molecule,Integer
+CalcNumRings,Number of all rings,Integer
+CalcNumRotatableBonds,Number of bonds which can rotate,Integer
+CalcNumSaturatedCarbocycles,Completely saturated carbon-only rings,Integer
+CalcNumSaturatedHeterocycles,Completely saturated rings with non-carbon atoms,Integer
+CalcNumSaturatedRings,All saturated rings,Integer
+CalcNumUnspecifiedAtomStereoCenters,Number of stereocenters not given explicitly,Integer
+CalcTPSA,Topological polar surface area (TPSA) for 2D molecule,Integer
+MQNs_#list,molecular quantum numbers from https://doi.org/10.1002/cmdc.200900317; 42 elements ,Vector of integers
+PEOE_VSA_,MOE-type descriptors using partial charges and surface area contributions; 14 elements ,Vector of floats
+GetMorganFingerprintAsBitVect,"Vector of Fingerprints, variable length. None to 4096",Vector of integers
+num_single,Single bond count,Integer
+num_double,Double bond count,Integer
+num_triple,Trple bond count,Integer
+aromatic_bonds,Aromatic bond count,Integer
+num_fluorine,Number of fluorines,Integer
+num_chlorine,Number of chlorines,Integer
+num_bromine,Number of bromine atoms,Integer
+num_nitro,Number of nitrogens,Integer
+num_oxy,Number of oxygen atoms,Integer
+num_sulfur,Number of Sulfur atoms,Integer
+unique_colors,Unique canonical atom ranks,Integer
