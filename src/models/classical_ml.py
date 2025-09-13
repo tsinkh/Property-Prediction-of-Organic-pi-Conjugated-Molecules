@@ -1,103 +1,157 @@
-"""
-Classical ML models for molecular property prediction:
-- Ridge Regression
-- Support Vector Regression (SVR)
-- Kernel Ridge Regression (KRR)
-
-Evaluated with 5-fold cross-validation.
-"""
-
+import argparse
 import os
-import pandas as pd
-import numpy as np
 
-from sklearn.model_selection import KFold, cross_val_score
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import Pipeline
+import numpy as np
+import pandas as pd
+import joblib
+
+import optuna
+from sklearn.model_selection import KFold
 from sklearn.linear_model import Ridge
 from sklearn.svm import SVR
 from sklearn.kernel_ridge import KernelRidge
-from sklearn.metrics import make_scorer, r2_score, mean_absolute_error
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.impute import SimpleImputer
+from sklearn.metrics import r2_score, mean_absolute_error
 
-# ----------------------------
-# Config
-# ----------------------------
-DATA_PATH = os.path.join("data", "molecules.csv")
-TARGET_COLUMN = "HOMO"
-N_SPLITS = 5
-RANDOM_SEED = 42
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
+os.chdir(BASE_DIR)
 
-# ----------------------------
-# Load dataset
-# ----------------------------
-print("Loading dataset from:", DATA_PATH)
-df = pd.read_csv(DATA_PATH)
 
-# 假设目标列在最后一列或已知名称
-y = df[TARGET_COLUMN].values
+def objective(trial, X, y, model_name, results_list):
+    """定义 Optuna 的目标函数，并记录每折结果"""
 
-# 输入特征：去掉目标列
-X = df.drop(columns=[TARGET_COLUMN]).values
+    if model_name == "ridge":
+        alpha = trial.suggest_loguniform("alpha", 1e-3, 1e3)
+        model = Ridge(alpha=alpha)
+    elif model_name == "svr":
+        C = trial.suggest_loguniform("C", 1e-2, 1e2)
+        epsilon = trial.suggest_loguniform("epsilon", 1e-3, 1.0)
+        model = SVR(kernel="rbf", C=C, epsilon=epsilon)
+    elif model_name == "krr":
+        alpha = trial.suggest_loguniform("alpha", 1e-3, 1e3)
+        gamma = trial.suggest_loguniform("gamma", 1e-3, 1e1)
+        model = KernelRidge(kernel="rbf", alpha=alpha, gamma=gamma)
+    else:
+        raise ValueError(f"Unsupported model: {model_name}")
 
-print(f"Dataset shape: X={X.shape}, y={y.shape}")
-
-# ----------------------------
-# Define models
-# ----------------------------
-models = {
-    "Ridge": Ridge(alpha=1.0, random_state=RANDOM_SEED),
-    "SVR": SVR(kernel="rbf", C=1.0, epsilon=0.1),
-    "KRR": KernelRidge(alpha=1.0, kernel="rbf")
-}
-
-# ----------------------------
-# Cross-validation evaluation
-# ----------------------------
-kf = KFold(n_splits=N_SPLITS, shuffle=True, random_state=RANDOM_SEED)
-
-def evaluate_model(name, model, X, y):
-    """Run CV and return R2 and MAE scores."""
-    # pipeline: 标准化 + 模型
     pipeline = Pipeline([
+        ("imputer", SimpleImputer(strategy="mean")),
         ("scaler", StandardScaler()),
         ("model", model)
     ])
 
-    # R2
-    r2_scores = cross_val_score(
-        pipeline, X, y,
-        cv=kf, scoring="r2"
-    )
+    cv = KFold(n_splits=5, shuffle=True, random_state=42)
+    fold_r2, fold_mae = [], []
 
-    # MAE (需要自定义 scorer)
-    mae_scorer = make_scorer(mean_absolute_error, greater_is_better=False)
-    mae_scores = cross_val_score(
-        pipeline, X, y,
-        cv=kf, scoring=mae_scorer
-    )
+    for fold, (train_idx, val_idx) in enumerate(cv.split(X), 1):
+        X_train, X_val = X[train_idx], X[val_idx]
+        y_train, y_val = y[train_idx], y[val_idx]
 
-    return r2_scores, -mae_scores  # 取负号，转为正的 MAE
+        pipeline.fit(X_train, y_train)
+        y_pred = pipeline.predict(X_val)
 
-results = []
+        r2 = r2_score(y_val, y_pred)
+        mae = mean_absolute_error(y_val, y_pred)
 
-for name, model in models.items():
-    r2_scores, mae_scores = evaluate_model(name, model, X, y)
-    results.append({
-        "Model": name,
-        "R2_mean": np.mean(r2_scores),
-        "R2_std": np.std(r2_scores),
-        "MAE_mean": np.mean(mae_scores),
-        "MAE_std": np.std(mae_scores)
+        fold_r2.append(r2)
+        fold_mae.append(mae)
+
+        results_list.append({
+            "trial": trial.number,
+            **trial.params,
+            "fold": fold,
+            "r2": r2,
+            "mae": mae,
+        })
+
+    results_list.append({
+        "trial": trial.number,
+        **trial.params,
+        "fold": "mean",
+        "r2": np.mean(fold_r2),
+        "mae": np.mean(fold_mae),
     })
-    print(f"[{name}] R2={np.mean(r2_scores):.3f}±{np.std(r2_scores):.3f}, "
-          f"MAE={np.mean(mae_scores):.3f}±{np.std(mae_scores):.3f}")
 
-# ----------------------------
-# Save results
-# ----------------------------
-results_df = pd.DataFrame(results)
-os.makedirs("results", exist_ok=True)
-save_path = os.path.join("results", f"classical_ml_{TARGET_COLUMN}.csv")
-results_df.to_csv(save_path, index=False)
+    return np.mean(fold_r2)
 
-print("Results saved to:", save_path)
+
+def main():
+    parser = argparse.ArgumentParser(description="Classical ML with Optuna hyperparameter tuning")
+    parser.add_argument("--target", type=str, required=True,
+                        help="Target property to predict: vie, aie, vea, aea, hl, s0s1, s0t1, hr, cr2, cr1, er, ar1, ar2, lumo, homo")
+    parser.add_argument("--model", type=str, default="ridge",
+                        choices=["ridge", "svr", "krr"],
+                        help="Model type: ridge, svr, krr")
+    parser.add_argument("--data_dir", type=str, default="processed",
+                        help="Directory with X.npy and y.csv")
+    parser.add_argument("--results_dir", type=str, default="results",
+                        help="Directory to save results")
+    parser.add_argument("--trials", type=int, default=50,
+                        help="Number of Optuna trials")
+    args = parser.parse_args()
+
+    X = np.load(f"{args.data_dir}/X.npy")
+    y_df = pd.read_csv(f"{args.data_dir}/y.csv")
+
+    if args.target not in y_df.columns:
+        raise ValueError(f"Target {args.target} not found in y.csv. Available: {list(y_df.columns)}")
+
+    y = y_df[args.target].values
+
+    results_list = []
+    study = optuna.create_study(direction="maximize")
+    study.optimize(lambda trial: objective(trial, X, y, args.model, results_list), # type: ignore
+                   n_trials=args.trials)
+
+    print(f"Best R²: {study.best_value:.4f}")
+    print("Best hyperparameters:", study.best_params)
+
+    os.makedirs(args.results_dir, exist_ok=True)
+    results_df = pd.DataFrame(results_list)
+
+    best_trial = study.best_trial.number
+    best_mean_row = results_df[(results_df["trial"] == best_trial) & (results_df["fold"] == "mean")].iloc[0]
+
+    final_row = {
+        "trial": "final",
+        **study.best_params,
+        "fold": "all",
+        "r2": best_mean_row["r2"],
+        "mae": best_mean_row["mae"]
+    }
+
+    results_df = pd.concat([results_df, pd.DataFrame([final_row])], ignore_index=True)
+
+    csv_path = os.path.join(args.results_dir, f"{args.model}_{args.target}.csv")
+    results_df.to_csv(csv_path, index=False)
+    print(f"All trial results saved to {csv_path}")
+
+    if args.model == "ridge":
+        model = Ridge(alpha=study.best_params["alpha"])
+    elif args.model == "svr":
+        model = SVR(kernel="rbf",
+                    C=study.best_params["C"],
+                    epsilon=study.best_params["epsilon"])
+    elif args.model == "krr":
+        model = KernelRidge(kernel="rbf",
+                            alpha=study.best_params["alpha"],
+                            gamma=study.best_params["gamma"])
+    else:
+        raise ValueError(f"Unsupported model: {args.model}")
+
+    pipeline = Pipeline([
+        ("imputer", SimpleImputer(strategy="mean")),
+        ("scaler", StandardScaler()),
+        ("model", model)
+    ])
+
+    pipeline.fit(X, y)
+    model_path = os.path.join(args.results_dir, f"{args.model}_{args.target}.pkl")
+    joblib.dump(pipeline, model_path)
+    print(f"Final model trained on all data saved to {model_path}")
+
+
+if __name__ == "__main__":
+    main()
