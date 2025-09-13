@@ -1,0 +1,38 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environments
+.venv/
+env/
+venv/
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Processed outputs
+processed/
+*.npy
+*.npz
+
+# Results
+results/
+*.pkl
+*.joblib
+
+# Optuna study artifacts
+*.db
+
+# VSCode / PyCharm configs
+.vscode/
+.idea/
