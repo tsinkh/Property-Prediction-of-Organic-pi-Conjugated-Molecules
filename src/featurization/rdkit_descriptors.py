@@ -1,7 +1,3 @@
-"""
-Generate molecular descriptors using RDKit.
-"""
-
 from rdkit import Chem
 from rdkit.Chem import Descriptors
 import pandas as pd
@@ -20,7 +16,7 @@ def compute_rdkit_descriptors(smiles_list):
         list: descriptor names
     """
     mols = [Chem.MolFromSmiles(s) for s in smiles_list]
-    # Use all numeric descriptors available in RDKit
+
     descriptor_names = [d[0] for d in Descriptors.descList]
     descriptors = []
     for mol in mols:
@@ -32,8 +28,7 @@ def compute_rdkit_descriptors(smiles_list):
 
 
 if __name__ == "__main__":
-    # Test run
-    smiles = ["C1=CC=CC=C1", "CCO", "C"]
+    smiles = ["C1=CC=CC=C1", "CCO", "C"] # test run
     X, names = compute_rdkit_descriptors(smiles)
     df = pd.DataFrame(X, columns=names)
     print(df.head())

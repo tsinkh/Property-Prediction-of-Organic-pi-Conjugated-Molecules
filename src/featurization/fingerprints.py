@@ -1,7 +1,3 @@
-"""
-Generate molecular fingerprints (ECFP).
-"""
-
 from rdkit import Chem
 from rdkit.Chem import AllChem
 import numpy as np
@@ -25,7 +21,7 @@ def compute_ecfp(smiles_list, radius=2, n_bits=2048):
         if mol is None:
             fps.append(np.zeros(n_bits))
         else:
-            fp = AllChem.GetMorganFingerprintAsBitVect(mol, radius, nBits=n_bits)
+            fp = AllChem.GetMorganFingerprintAsBitVect(mol, radius, nBits=n_bits) # type: ignore
             arr = np.zeros((1,), dtype=int)
             fp_array = np.array([int(fp.GetBit(i)) for i in range(n_bits)])
             fps.append(fp_array)
