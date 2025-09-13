@@ -1,11 +1,18 @@
-torch==1.10
-torchvision
-dgl==0.7.2
-dgl-lifesci==0.2.8
-scikit-learn==0.24.2
-rdkit-pypi
-optuna==2.10.0
-uncertainty-toolbox
-pandas
-numpy
-matplotlib
+numpy==2.0.1
+pandas==2.3.2
+scikit-learn==1.7.1
+rdkit-pypi==2025.03.6
+joblib==1.5.1
+optuna==4.5.0
+matplotlib==3.10.6
+
+# PyTorch (for neural networks and GNNs)
+# torch==1.10.0
+# torchvision==0.11.0
+
+# Graph Neural Networks
+# dgl==0.7.2
+# dgl-lifesci==0.2.8
+
+# Uncertainty estimation
+# uncertainty-toolbox==0.1.1
