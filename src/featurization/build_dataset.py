@@ -30,7 +30,7 @@ def build_dataset():
 
     print("Building feature matrix...")
     X = np.hstack([desc_array, fp_array])
-    feature_names = desc_names + [f"ECFP{i}" for i in range(ECFP_BITS)]
+    feature_names = desc_names + [f"ECFP{i}" for i in range(ECFP_BITS)] # type: ignore
 
     target_cols = [c for c in df.columns if c not in ["identifier", "smiles"]]
     y = df[target_cols]
