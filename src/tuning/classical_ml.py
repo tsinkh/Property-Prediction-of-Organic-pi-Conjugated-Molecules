@@ -17,18 +17,21 @@ os.chdir(BASE_DIR)
 
 def objective(trial, X, y, model_name, results_list):
     """Optuna objective function with 5-fold CV, saving each fold's results"""
+    if model_name in ["svr", "krr"] and X.shape[0] > 5000:
+        idx = np.random.choice(X.shape[0], 5000, replace=False)
+        X, y = X[idx], y[idx]
     if model_name == "ridge":
         alpha = trial.suggest_loguniform("alpha", 1e-3, 1e3)
         model = Ridge(alpha=alpha)
     elif model_name == "svr":
         C = trial.suggest_float("C", 0.5, 2)
         epsilon = trial.suggest_float("epsilon", 0.01, 0.5)
-        kernel = trial.suggest_categorical("kernel", ["linear", "poly", "rbf"])
+        kernel = trial.suggest_categorical("kernel", ["linear", "poly", "rbf", "sigmoid"])
         model = SVR(kernel=kernel, C=C, epsilon=epsilon)
     elif model_name == "krr":
         alpha = trial.suggest_loguniform("alpha", 1e-3, 1e3)
-        gamma = trial.suggest_loguniform("gamma", 1e-3, 1e1)
-        model = KernelRidge(kernel="rbf", alpha=alpha, gamma=gamma)
+        kernel = trial.suggest_categorical("kernel", ["linear", "poly", "rbf", "sigmoid", "laplacian"])
+        model = KernelRidge(kernel=kernel, alpha=alpha)
     else:
         raise ValueError(f"Unsupported model: {model_name}")
 
