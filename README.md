@@ -20,19 +20,29 @@ Implemented model hierarchy:
 ## 📂 Repository Structure
 
 ```
-├── data/                  # Raw data (molecules.csv, descriptor info, etc.)├── processed/             # Preprocessed feature matrices (X.npy, y.csv, features.csv)
+├── data/                   # Raw data (e.g., molecules.csv, descriptor info)
+├── processed/              # Preprocessed feature matrices
+│   ├── X.npy               # Feature matrix (RDKit + optional ECFP)
+│   ├── y.csv               # Target properties
+│   └── features.csv        # Feature names
 ├── results/
-│   ├── tuning/            # CSV files with CV results + best hyperparameters
-│   ├── models/            # Final trained models (.pkl)
-│   └── best_params.json
+│   ├── tuning/             # Optuna tuning results (CSV per model/target)
+│   ├── models/             # Trained models
+│   └── best_params.json    # Best hyperparameters across models/targets
 ├── src/
-│   ├── featurization/     # Feature generation (RDKit descriptors, ECFP fingerprints)
-│   ├── models/            # Training scripts for models (use best_params.json)
-│   └── tuning/            # Hyperparameter tuning with Optuna
+│   ├── featurization/      # Feature generation (RDKit descriptors, ECFP fingerprints)
+│   │   ├── build_dataset.py
+│   │   └── rdkit_descriptors.py
+│   ├── models/             # Training scripts (use best_params.json)
+│   │   ├── classical_ml.py
+│   │   └── ffn.py
+│   └── tuning/             # Hyperparameter tuning (Optuna)
+│       ├── classical_ml.py
+│       └── ffn.py
 ├── .gitignore
 ├── LICENSE
 ├── README.md
-└── requirments.txt
+└── requirements.txt        # Python dependencies
 ```
 
 ---
@@ -89,6 +99,10 @@ This will:
 * Save per-fold and mean results in `results/tuning/ridge_homo.csv`
 * Update `results/best_params.json` with the best parameters
 
+Change `--model` to `svr` or `krr` for other classical ML baselines.
+Change `--target` to any property in `processed/y.csv` (e.g. `lumo`, `vie`, `aie`).
+Change `--trials` to set the number of Optuna hyperparameter search trials.
+
 #### Step 2: Train final model
 
 ```bash
@@ -102,7 +116,47 @@ This will:
 * Save the trained model to `results/models/ridge_homo.pkl`
 
 Change `--model` to `svr` or `krr` for other classical ML baselines.
-Change `--target` to any property in `processed/y.csv` (e.g. `lumo`, `vie`, `aie`).
+Change `--target` to any property in `processed/y.csv`.
+
+---
+
+### 2. Feed-Forward Neural Networks (FFN)
+
+#### Step 1: Hyperparameter tuning
+
+Run FFN tuning on HOMO prediction:
+
+```bash
+python src/tuning/ffn.py --target homo --trials 30
+```
+
+This will:
+
+* Tune **hidden size**, **number of layers**, **dropout rate**, **learning rate**, and **batch size**
+* Use **ReLU activation** and **Adam optimizer**
+* Fixed training length of **50 epochs per fold**
+* Perform **5-fold CV** on the training set
+* Save tuning results to `results/tuning/ffn_homo.csv`
+* Update `results/best_params.json` with the best configuration
+
+Change `--target` to any property in `processed/y.csv`.
+Change `--trials` to set the number of Optuna hyperparameter search trials.
+
+#### Step 2: Train final model
+
+```bash
+python src/models/ffn.py --target homo --epochs 100
+```
+
+This will:
+
+* Load the best hyperparameters for `homo` from `results/best_params.json`
+* Train the FFN on the **full dataset** (`processed/X.npy`)
+* Run for the specified number of epochs (`--epochs`, default 100)
+* Save the trained model to `results/models/ffn_homo.pt`
+
+Change `--target` to any property in `processed/y.csv`.
+Change `--epochs` to set the number of training epochs for the final model.
 
 ---
 
