@@ -21,28 +21,35 @@ Implemented model hierarchy:
 
 ```
 ├── data/                   # Raw data (e.g., molecules.csv, descriptor info)
-├── processed/              # Preprocessed feature matrices
-│   ├── X.npy               # Feature matrix (RDKit + optional ECFP)
-│   ├── y.csv               # Target properties
-│   └── features.csv        # Feature names
+├── processed/               # Preprocessed feature matrices or graph data
+│   ├── X.npy                # Feature matrix (RDKit + optional ECFP)
+│   ├── y.csv                # Target properties
+│   ├── features.csv         # Feature names (for FFN/classical models)
+│   ├── graphs.bin           # DGL graph objects (for MPNN)
+│   └── graphs_info.json     # Node/edge feature dimensions
 ├── results/
-│   ├── tuning/             # Optuna tuning results (CSV per model/target)
-│   ├── models/             # Trained models
-│   └── best_params.json    # Best hyperparameters across models/targets
+│   ├── tuning/              # Optuna tuning results (CSV per model/target)
+│   ├── models/              # Trained models
+│   └── best_params.json     # Best hyperparameters across models/targets
 ├── src/
-│   ├── featurization/      # Feature generation (RDKit descriptors, ECFP fingerprints)
+│   ├── featurization/       # Feature generation (RDKit descriptors, ECFP, MPNN features)
 │   │   ├── build_dataset.py
-│   │   └── rdkit_descriptors.py
-│   ├── models/             # Training scripts (use best_params.json)
+│   │   ├── fingerprints.py
+│   │   ├── rdkit_descriptors.py
+│   │   ├── mpnn_featurizer.py
+│   │   └── mpnn_readout.py
+│   ├── models/              # Training scripts (use best_params.json)
 │   │   ├── classical_ml.py
-│   │   └── ffn.py
-│   └── tuning/             # Hyperparameter tuning (Optuna)
+│   │   ├── ffn.py
+│   │   └── mpnn.py
+│   └── tuning/              # Hyperparameter tuning (Optuna)
 │       ├── classical_ml.py
-│       └── ffn.py
+│       ├── ffn.py
+│       └── mpnn.py
 ├── .gitignore
 ├── LICENSE
 ├── README.md
-└── requirements.txt        # Python dependencies
+└── requirements.txt          # Python dependencies
 ```
 
 ---
@@ -78,6 +85,18 @@ This will generate:
 * `processed/X.npy` – feature matrix (descriptors + ECFP)
 * `processed/y.csv` – target properties
 * `processed/features.csv` – feature names
+
+For MPNN models, you instead need to build graph features:
+
+```bash
+python src/featurization/mpnn_featurizer.py
+```
+
+This will generate:
+
+* `processed/graphs.bin` – DGL graphs converted from SMILES
+* `processed/y.csv` – same target file
+* `processed/graphs_info.json` – node/edge feature dimension information
 
 ---
 
@@ -154,6 +173,44 @@ This will:
 * Train the FFN on the **full dataset** (`processed/X.npy`)
 * Run for the specified number of epochs (`--epochs`, default 100)
 * Save the trained model to `results/models/ffn_homo.pt`
+
+Change `--target` to any property in `processed/y.csv`.
+Change `--epochs` to set the number of training epochs for the final model.
+
+---
+
+### 3. Message Passing Neural Network (MPNN)
+
+#### Step 1: Hyperparameter tuning
+
+Run Optuna tuning on HOMO prediction:
+
+```bash
+python src/tuning/mpnn.py --target homo --trials 30
+```
+
+This will:
+
+* Tune **message passing steps**, **Set2Set steps/layers**, **hidden sizes**, **dropout**, **learning rate**, and **batch size**
+* Perform **5-fold CV** for each Optuna trial
+* Save per-fold and mean results in `results/tuning/mpnn_homo.csv`
+* Update `results/best_params.json` with the best parameters
+
+Change `--target` to any property in `processed/y.csv` (e.g. `lumo`, `vie`, `aie`).
+Change `--trials` to set the number of Optuna hyperparameter search trials.
+
+#### Step 2: Train final model
+
+```bash
+python src/models/mpnn.py --target homo --epochs 100
+```
+
+This will:
+
+* Load the best hyperparameters for `homo` from `results/best_params.json`
+* Train the MPNN on the **graph dataset** (`processed/graphs.bin`)
+* Run for the specified number of epochs (`--epochs`, default 100)
+* Save the trained model to `results/models/mpnn_homo.pt`
 
 Change `--target` to any property in `processed/y.csv`.
 Change `--epochs` to set the number of training epochs for the final model.

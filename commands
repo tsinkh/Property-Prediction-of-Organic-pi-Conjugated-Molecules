@@ -1,0 +1,75 @@
+python src/tuning/classical_ml.py --target vie --model ridge --trials 50
+python src/tuning/classical_ml.py --target aie --model ridge --trials 50
+python src/tuning/classical_ml.py --target vea --model ridge --trials 50
+python src/tuning/classical_ml.py --target aea --model ridge --trials 50
+python src/tuning/classical_ml.py --target hl --model ridge --trials 50
+python src/tuning/classical_ml.py --target s0s1 --model ridge --trials 50
+python src/tuning/classical_ml.py --target s0t1 --model ridge --trials 50
+python src/tuning/classical_ml.py --target hr --model ridge --trials 50
+python src/tuning/classical_ml.py --target cr2 --model ridge --trials 50
+python src/tuning/classical_ml.py --target cr1 --model ridge --trials 50
+python src/tuning/classical_ml.py --target er --model ridge --trials 50
+python src/tuning/classical_ml.py --target ar1 --model ridge --trials 50
+python src/tuning/classical_ml.py --target ar2 --model ridge --trials 50
+python src/tuning/classical_ml.py --target lumo --model ridge --trials 50
+python src/tuning/classical_ml.py --target homo --model ridge --trials 50
+python src/tuning/classical_ml.py --target vie --model svr --trials 30
+python src/tuning/classical_ml.py --target aie --model svr --trials 30
+python src/tuning/classical_ml.py --target vea --model svr --trials 30
+python src/tuning/classical_ml.py --target aea --model svr --trials 30
+python src/tuning/classical_ml.py --target hl --model svr --trials 30
+python src/tuning/classical_ml.py --target s0s1 --model svr --trials 30
+python src/tuning/classical_ml.py --target s0t1 --model svr --trials 30
+python src/tuning/classical_ml.py --target hr --model svr --trials 30
+python src/tuning/classical_ml.py --target cr2 --model svr --trials 30
+python src/tuning/classical_ml.py --target cr1 --model svr --trials 30
+python src/tuning/classical_ml.py --target er --model svr --trials 30
+python src/tuning/classical_ml.py --target ar1 --model svr --trials 30
+python src/tuning/classical_ml.py --target ar2 --model svr --trials 30
+python src/tuning/classical_ml.py --target lumo --model svr --trials 30
+python src/tuning/classical_ml.py --target homo --model svr --trials 30
+python src/tuning/classical_ml.py --target vie --model krr --trials 50
+python src/tuning/classical_ml.py --target aie --model krr --trials 50
+python src/tuning/classical_ml.py --target vea --model krr --trials 50
+python src/tuning/classical_ml.py --target aea --model krr --trials 50
+python src/tuning/classical_ml.py --target hl --model krr --trials 50
+python src/tuning/classical_ml.py --target s0s1 --model krr --trials 50
+python src/tuning/classical_ml.py --target s0t1 --model krr --trials 50
+python src/tuning/classical_ml.py --target hr --model krr --trials 50
+python src/tuning/classical_ml.py --target cr2 --model krr --trials 50
+python src/tuning/classical_ml.py --target cr1 --model krr --trials 50
+python src/tuning/classical_ml.py --target er --model krr --trials 50
+python src/tuning/classical_ml.py --target ar1 --model krr --trials 50
+python src/tuning/classical_ml.py --target ar2 --model krr --trials 50
+python src/tuning/classical_ml.py --target lumo --model krr --trials 50
+python src/tuning/classical_ml.py --target homo --model krr --trials 50
+python src/tuning/ffn.py --target vie --trials 30
+python src/tuning/ffn.py --target aie --trials 30
+python src/tuning/ffn.py --target vea --trials 30
+python src/tuning/ffn.py --target aea --trials 30
+python src/tuning/ffn.py --target hl --trials 30
+python src/tuning/ffn.py --target s0s1 --trials 30
+python src/tuning/ffn.py --target s0t1 --trials 30
+python src/tuning/ffn.py --target hr --trials 30
+python src/tuning/ffn.py --target cr2 --trials 30
+python src/tuning/ffn.py --target cr1 --trials 30
+python src/tuning/ffn.py --target er --trials 30
+python src/tuning/ffn.py --target ar1 --trials 30
+python src/tuning/ffn.py --target ar2 --trials 30
+python src/tuning/ffn.py --target lumo --trials 30
+python src/tuning/ffn.py --target homo --trials 30
+python src/tuning/mpnn.py --target vie --trials 30
+python src/tuning/mpnn.py --target aie --trials 30
+python src/tuning/mpnn.py --target vea --trials 30
+python src/tuning/mpnn.py --target aea --trials 30
+python src/tuning/mpnn.py --target hl --trials 30
+python src/tuning/mpnn.py --target s0s1 --trials 30
+python src/tuning/mpnn.py --target s0t1 --trials 30
+python src/tuning/mpnn.py --target hr --trials 30
+python src/tuning/mpnn.py --target cr2 --trials 30
+python src/tuning/mpnn.py --target cr1 --trials 30
+python src/tuning/mpnn.py --target er --trials 30
+python src/tuning/mpnn.py --target ar1 --trials 30
+python src/tuning/mpnn.py --target ar2 --trials 30
+python src/tuning/mpnn.py --target lumo --trials 30
+python src/tuning/mpnn.py --target homo --trials 30
