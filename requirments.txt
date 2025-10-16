@@ -1,18 +1,27 @@
-numpy==2.0.1
+numpy==1.25.2
 pandas==2.3.2
 scikit-learn==1.7.1
-rdkit-pypi==2025.03.6
+# RDKit: conda-forge rdkit or rdkit-pypi can be used. The `molpred` env uses rdkit 2025.03.6.
+rdkit==2025.03.6
 joblib==1.5.1
 optuna==4.5.0
 matplotlib==3.10.6
 
 # PyTorch (for neural networks and GNNs)
-# torch==1.10.0
-# torchvision==0.11.0
+# The molpred environment has the following installed (CPU builds shown):
+torch==2.2.2
+torchvision==0.17.2
+torchaudio==2.2.2
+# torchdata shows as 0.11.0+cpu in the environment
+torchdata==0.11.0
 
 # Graph Neural Networks
-# dgl==0.7.2
-# dgl-lifesci==0.2.8
+# DGL on Windows sometimes requires a matching wheel; molpred uses dgl 2.0.0
+dgl==2.0.0
+dgllife==0.3.2
 
-# Uncertainty estimation
-# uncertainty-toolbox==0.1.1
+# Notes:
+# - Some PyTorch/DGL wheels use platform-specific tags (e.g. +cpu or CUDA variants).
+#   For PyTorch CPU builds you may need:
+#     pip install --extra-index-url https://download.pytorch.org/whl/cpu torch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2
+# - If you prefer the rdkit-pypi wheel instead of conda-forge, pin that version explicitly.
