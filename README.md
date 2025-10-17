@@ -215,6 +215,44 @@ This will:
 Change `--target` to any property in `processed/y.csv`.
 Change `--epochs` to set the number of training epochs for the final model.
 
+### 4. MPNN + Evidential Uncertainty
+
+#### Step 1: Hyperparameter tuning
+
+Run Optuna tuning on HOMO prediction:
+
+```bash
+python src/tuning/mpnn_evidential.py --target homo --trials 30
+```
+
+This will:
+
+* Tune **message passing steps**, **Set2Set steps/layers**, **hidden sizes**, **dropout**, **learning rate**, and **batch size**
+* Perform **5-fold CV** per trial and compute R²/MAE on validation folds
+* Save detailed results in `results/tuning/mpnn_evidential_homo.csv`
+* Update `results/best_params.json` under `"mpnn_evidential"` with the best parameters
+
+Change `--target` to any property name in `processed/y.csv`.
+Increase `--trials` for more extensive hyperparameter search.
+
+---
+
+#### Step 2: Train final model
+
+Use the best hyperparameters found above to train on the full dataset:
+
+```bash
+python src/models/mpnn_evidential.py --target homo --epochs 100
+```
+
+This will:
+
+* Load the best hyperparameters for `homo` from `results/best_params.json`
+* Build the `MPNN_evidential_readout` model defined in `src/featurization/mpnn_evidential_readout.py`
+* Train the model using **Adam (lr = best_param)** and **Evidential Loss**
+* Run for the specified number of epochs (default 100)
+* Save trained model weights to `results/models/mpnn_evidential_homo.pt`
+
 ---
 
 ## 📜 License
