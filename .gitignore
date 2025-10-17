@@ -26,8 +26,7 @@ processed/
 *.npz
 
 # Model results
-results/tuning/
-results/models/
+results/
 *.pkl
 *.joblib
 
